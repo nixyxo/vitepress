@@ -1,6 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import matter from 'gray-matter'
+import matter, { GrayMatterOption } from 'gray-matter'
 import LRUCache from 'lru-cache'
 import { createMarkdownRenderer, MarkdownOptions } from './markdown/markdown'
 import { deeplyParseHeader } from './utils/parseHeader'
@@ -22,7 +22,7 @@ export interface MarkdownCompileResult {
 
 export function createMarkdownToVueRenderFn(
   srcDir: string,
-  options: MarkdownOptions = {},
+  options: MarkdownOptions & { frontmatter?: GrayMatterOption<string, any> } = {},
   pages: string[],
   userDefines: Record<string, any> | undefined,
   isBuild = false
@@ -64,7 +64,7 @@ export function createMarkdownToVueRenderFn(
       return content
     })
 
-    const { content, data: frontmatter } = matter(src)
+    const { content, data: frontmatter } = matter(src, options.frontmatter)
     let { html, data } = md.render(content)
 
     if (isBuild) {
